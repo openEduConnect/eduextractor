@@ -1,3 +1,6 @@
+from eduextractor import secrets
+
+
 class RemoteSource():
     """A remote source of data, 
     the fundamental abstraction of the project.
