@@ -1,4 +1,4 @@
-from eduextractor.config import secrets
+from config import secrets
 
 from mechanize import Browser
 from zipfile import ZipFile
@@ -51,5 +51,4 @@ def main():
     sourceZip.close()
 
 if __name__ == '__main__':
-    print secrets
     main()
