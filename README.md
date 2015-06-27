@@ -3,7 +3,7 @@ Extraction-Transformation Tools for Education Data.
 
 ## Supported Datasources 
 * NWEA MAP Scores
-
+* Powerschool
 ## Supported Backends
 * CSV
 * SQLAlchemy (There postgresql, mysql, sqlite, and more!)
@@ -18,3 +18,6 @@ nwea_map:
   secret: your_secret_pw
   dest: '/tmp'
 ```
+
+## Powerschool 
+Custom page on Powerschool. 
