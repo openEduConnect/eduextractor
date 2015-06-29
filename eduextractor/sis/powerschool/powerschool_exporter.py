@@ -73,7 +73,8 @@ class PowerSchoolAdmin():
                 ,cookies=cookies,
                 data = payload)
         return r
-    
+    def _upload_html(self):
+        print 's'
         
 if __name__ == '__main__':
     psa = PowerSchoolAdmin()
