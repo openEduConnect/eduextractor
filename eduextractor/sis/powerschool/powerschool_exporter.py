@@ -1,7 +1,10 @@
 from eduextractor.config import secrets
 from eduextractor.browser import Driver
 
+from selenium.common.exceptions import NoSuchElementException
 from urlparse import urlparse
+import requests
+
 class PowerSchoolFrontend():
     """A class, representing a interface to the Powerschool frontend
     which most teachers/students/admins have access to. 
@@ -36,25 +39,47 @@ class PowerSchoolAdmin():
     postfix = SECRETS['postfix']
     url = secrets['powerschool']['frontend']['url']
     dr = Driver().driver
+    o = urlparse (url + postfix)
     def login(self):
+        """Runs the login flow
+        """
         self.dr.get(self.url + self.postfix)
         #find the username, pw fields
-        fuser = self.dr.find_element_by_id('j_username')
-        fpw = self.dr.find_element_by_id('j_password')
-        # send the keys
-        fuser.send_keys(self.username)
-        fpw.send_keys(self.password)
-        # Click the button! 
-        button = self.dr.find_element_by_id('loginsubmit')
-        button.click()
-
+        try:
+            fuser = self.dr.find_element_by_id('j_username')
+            fpw = self.dr.find_element_by_id('j_password')
+            # send the keys
+            fuser.send_keys(self.username)
+            fpw.send_keys(self.password)
+            # Click the button! 
+            button = self.dr.find_element_by_id('loginsubmit')
+            button.click()
+        except NoSuchElementException: 
+            # If no login element, then person is already logged in
+            return  
+    def _go_to_custom_pages(self):
+        self.dr.get(self.url + self.postfix + '/custompages/index.action')
+    def _add_eduextractor_folder(self):
+        all_cookies = self.dr.get_cookies()
+        ## Convert cookies into request format
+        cookies = {}  
+        for s_cookie in all_cookies:
+            cookies[s_cookie["name"]]=s_cookie["value"]
+        
+        payload = {'newAssetName': 'eduextractor', 'newAssetPath': 'admin',
+                'newAssetType': 'folder'}
+        r = requests.post(self.o.scheme + '://' +
+                self.o.netloc + '/powerschool-sys-mgmt/custompages/createAsset.action'
+                ,cookies=cookies,
+                data = payload)
+        return r
+    
+        
 if __name__ == '__main__':
-    #psf = PowerSchoolFrontend()
-    #psf.login()
     psa = PowerSchoolAdmin()
     psa.login()
-#notes on flow    
-# powerschool login 
+    psa._go_to_custom_pages()
+    psa._add_eduextractor_folder()
 # ask for the specific table
 
 # download table
