@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<!-- non framed -->
+<head>
+<!-- X-PS-DATA TYPE="HTML" PSPATH="//admin/attendance/functions/attendancestatus.html" -->
+<title>Period Attendance Grid</title>
+~[wc:commonscripts]
+<link href="/images/css/screen.css" rel="stylesheet" media="screen">
+<link href="/images/css/print.css" rel="stylesheet" media="print">
+</head>
+
+<body>
+
+~[wc:admin_header_css]<!-- breadcrumb start --><a href="/admin/home.html" target="_top">~[text:psx.html.admin_attendance_functions.attendancestatus.start_page]</a> &gt;~[text:psx.html.admin_attendance_functions.attendancestatus.attendance1]<!-- breadcrumb end -->~[wc:admin_navigation_css]
+
+<!-- START OF CUSTOMIZATION -->
+
+<h1>Period Attendance Audit ~[bulletindate]: Alpha</h1>
+
+<!-- end of title -->
+
+<!-- start of content -->
+<table border="1" cellspacing="0" cellpadding="4" align="center">
+
+<!---begin Attendance Audit Grid -- ALM 6-09-11---!>
+
+<tr>
+<td class="bold" width="1">ID</td>
+<td class="bold" width="5">Name</td>
+
+</tr>
+~[tlist_sql;
+select id, lastfirst from students s;alternatecolor]
+
+<tr class="oddrow" >
+	<td><font size="1.5">          ~(id;1)           </font>           </td>
+	<td><font size="1.5">          ~(lastfirst;t)    </font>           </td>
+</tr>
+[/tlist_sql]
+
+<!-- end Period Attendance Grid -->
+</table>
+
+<br>
+<br>
+
+<table border="0" cellspacing="0" cellpadding="4" align="center">
+<tr bgcolor="#edf3fe">
+<td align="center">Change Period Attendance Audit to:</td>
+</tr>
+<tr>
+<td align="center"><a href="period_attendance_grid.html?date=~[bulletindate;-1]">~[bulletindate;-1]</a> | ~[bulletindate;0] | <a href="period_attendance_grid.html?date=~[bulletindate;1]">~[bulletindate;1]</a></td>
+</tr>
+</table>
+<br>
+<br>
+
+~[wc:admin_footer_css]
+
+</body>
+</html><!-- non framed -->
