@@ -30,11 +30,29 @@ class PowerSchoolAdmin():
     upload html pages that expose ts_sql (the custom variant of SQL that 
     powerschool uses and allows HTML injection of.)
     """
-
+    SECRETS = secrets['powerschool']['admin']
+    username = SECRETS['username']
+    password = SECRETS['password']
+    postfix = SECRETS['postfix']
+    url = secrets['powerschool']['frontend']['url']
+    dr = Driver().driver
+    def login(self):
+        self.dr.get(self.url + self.postfix)
+        #find the username, pw fields
+        fuser = self.dr.find_element_by_id('j_username')
+        fpw = self.dr.find_element_by_id('j_password')
+        # send the keys
+        fuser.send_keys(self.username)
+        fpw.send_keys(self.password)
+        # Click the button! 
+        button = self.dr.find_element_by_id('loginsubmit')
+        button.click()
 
 if __name__ == '__main__':
-    psf = PowerSchoolFrontend()
-    psf.login()
+    #psf = PowerSchoolFrontend()
+    #psf.login()
+    psa = PowerSchoolAdmin()
+    psa.login()
 #notes on flow    
 # powerschool login 
 # ask for the specific table
