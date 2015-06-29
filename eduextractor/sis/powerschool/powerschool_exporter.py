@@ -10,10 +10,19 @@ class PowerSchoolFrontend():
     username = SECRETS['username']
     password = SECRETS['password']
     url = SECRETS['url']
-    o = urlparse(url)
-    dr = Driver()
+    postfix = SECRETS['postfix']
+    dr = Driver().driver
     def login(self):
-        self.dr.get(self.o)
+        """Go login to the Pearson site, in a browser window
+        """
+        self.dr.get(self.url + self.postfix)
+        ## Username and Password Fields
+        field = self.dr.find_element_by_id('fieldPassword')
+        ## send the text with semicolon
+        field.send_keys(self.username + ';' + self.password)
+        ## Submit button
+        button = self.dr.find_element_by_id('btnEnter')
+        button.click()
 
 class PowerSchoolAdmin():
     """A class, representing an interface to the backend of a powerschool
