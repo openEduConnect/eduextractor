@@ -1,4 +1,4 @@
-from config import secrets
+from eduextractor.config import secrets
 import pandas as pd
 from sqlalchemy import create_engine
 

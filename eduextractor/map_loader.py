@@ -1,4 +1,4 @@
-from config import secrets
+from eduextractor.config import secrets
 
 from mechanize import Browser
 from zipfile import ZipFile
