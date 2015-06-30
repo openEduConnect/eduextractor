@@ -115,7 +115,11 @@ class PowerSchoolAdmin():
         """give a page that exists in in /admin/eduextractor
         finds the PowerSchool Custom Content id. 
         """
-        pass
+        r = requests.get(self.o.scheme + "://" + self.o.netloc + 
+                '/powerschool-sys-mgmt/custompages/builtintext.action?LoadFolderInfo=false&path=/admin/eduextractor/'+ 
+                page_name, 
+                cookies = self._convert_cookies())
+        return r.json()['activeCustomContentId']
 
 if __name__ == '__main__':
     psa = PowerSchoolAdmin()
