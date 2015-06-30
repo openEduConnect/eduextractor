@@ -1,0 +1,8 @@
+nose
+pandas
+python-dateutil
+pytz
+PyYAML
+requests
+selenium
+six
