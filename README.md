@@ -1,5 +1,6 @@
 # eduextractor
 Extraction-Transformation Tools for Education Data. 
+![build-passing-status](https://travis-ci.org/openEduConnect/eduextractor.svg?branch=master)
 
 ## Supported Datasources 
 * NWEA MAP Scores
