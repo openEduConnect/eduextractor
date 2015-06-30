@@ -60,12 +60,9 @@ class PowerSchoolAdmin():
     def _go_to_custom_pages(self):
         self.dr.get(self.url + self.postfix + '/custompages/index.action')
     def _add_eduextractor_folder(self):
-        all_cookies = self.dr.get_cookies()
-        ## Convert cookies into request format
-        cookies = {}  
-        for s_cookie in all_cookies:
-            cookies[s_cookie["name"]]=s_cookie["value"]
-        
+        """Adds the custom folder /admin/eduextractor
+        """
+        cookies = self._convert_cookies()
         payload = {'newAssetName': 'eduextractor', 'newAssetPath': 'admin',
                 'newAssetType': 'folder'}
         r = requests.post(self.o.scheme + '://' +
@@ -73,8 +70,40 @@ class PowerSchoolAdmin():
                 ,cookies=cookies,
                 data = payload)
         return r
-    def _upload_html(self):
-        print 's'
+    def _create_html_page(self, page_name):
+        """Creates an HTML file on powerschool 
+        under /admin/eduextractor.  
+        
+        usage: psa._upload_html('test.html')
+        """
+        cookies = self._convert_cookies()
+        payload = {'newAssetName': page_name,
+                'newAssetPath': '/admin/eduextractor',
+                'newAssetType': 'file'}
+        r = requests.post(self.o.scheme + '://' + 
+                self.o.netloc + '/powerschool-sys-mgmt/custompages/createAsset.action',
+                cookies = cookies,
+                data = payload)
+        return r
+
+    def _publish_custom_page(self, page_name, fp):
+        """uploads a html file to the given location
+        """
+        cookies = self._convert_cookies()
+        payload = {'customContent': fp.read(),
+                'keyPath': "admin_eduextractor." + "page_name".replace('.html',''),
+                'customContentId': 1000,
+                'customContentPath': "/admin/eduextractor/" + page_name}
+    def _convert_cookies(self):
+        """Converts the cookies from Selenium to 
+        request format. 
+        """
+        all_cookies = self.dr.get_cookies()
+        ## Convert cookies into request format
+        cookies = {}  
+        for s_cookie in all_cookies:
+            cookies[s_cookie["name"]]=s_cookie["value"]
+        return cookies
         
 if __name__ == '__main__':
     psa = PowerSchoolAdmin()
