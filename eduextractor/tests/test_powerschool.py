@@ -6,7 +6,7 @@ class test_powerschool_frontend(unittest.TestCase):
     
     @classmethod
     def setUp(self):
-        ps = PowerSchoolFrontend()
+        self.ps = PowerSchoolFrontend()
 
     def testLogin(self):
         """
