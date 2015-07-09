@@ -9,11 +9,14 @@ class PowerSchoolFrontend():
     """A class, representing a interface to the Powerschool frontend
     which most teachers/students/admins have access to. 
     """
-    SECRETS = secrets['powerschool']['frontend']
-    username = SECRETS['username']
-    password = SECRETS['password']
-    url = SECRETS['url']
-    postfix = SECRETS['postfix']
+    try:
+        SECRETS = secrets['powerschool']['frontend']
+        username = SECRETS['username']
+        password = SECRETS['password']
+        url = SECRETS['url']
+        postfix = SECRETS['postfix']
+    except KeyError:
+        print "Please check the configuration of your config file"
     dr = Driver().driver
     def login(self):
         """Go login to the Pearson site, in a browser window
@@ -33,11 +36,14 @@ class PowerSchoolAdmin():
     upload html pages that expose ts_sql (the custom variant of SQL that 
     powerschool uses and allows HTML injection of.)
     """
-    SECRETS = secrets['powerschool']['admin']
-    username = SECRETS['username']
-    password = SECRETS['password']
-    postfix = SECRETS['postfix']
-    url = secrets['powerschool']['frontend']['url']
+    try:
+        SECRETS = secrets['powerschool']['admin']
+        username = SECRETS['username']
+        password = SECRETS['password']
+        postfix = SECRETS['postfix']
+        url = secrets['powerschool']['frontend']['url']
+    except KeyError:
+        print "Please check the configuration of your config file"
     dr = Driver().driver
     o = urlparse (url + postfix)
     def login(self):
