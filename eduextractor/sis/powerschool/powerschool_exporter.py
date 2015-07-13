@@ -96,9 +96,10 @@ class PowerSchoolAdmin():
         """uploads a html file to the given location
         """
         cookies = self._convert_cookies()
+        content = content.replace('\n','')
         payload = {'customContent': content,
                 'keyPath': "admin_eduextractor." + page_name.replace('.html',''),
-                'customContentId': _get_custom_content_id(page_name),
+                'customContentId': self._get_custom_content_id(page_name),
                 'customContentPath': "/admin/eduextractor/" + page_name}
         r = requests.post(self.o.scheme + '://' + self.o.netloc
                 + '/powerschool-sys-mgmt/custompages/publishCustomPageContent.action',

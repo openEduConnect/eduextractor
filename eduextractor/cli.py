@@ -44,6 +44,7 @@ def cli(sis, io):
                                    query, 'r')
             query_content = query_content_f.read()
             content = top + query_content + bottom
+            print content
             psa._publish_custom_page(page_name, content)
 
         # go to frontend
