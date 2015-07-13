@@ -1,5 +1,6 @@
 import click 
 from eduextractor.sis.powerschool import PowerSchoolAdmin, PowerSchoolFrontend
+import os
 
 
 @click.command()
@@ -21,7 +22,17 @@ def cli(sis, io):
         psa._go_to_custom_pages()
         # ps doesn't error if folder exists, so fine to run everytime
         psa._add_eduextractor_folder() 
+        
+        # Now let's prep our queries and files
+        print os.getcwd()
+
+        sql_queries = os.listdir('./eduextractor/sis/powerschool/sql/')
+        filenames = [f.replace('.sql', '.html') for f in sql_queries]
+        
+        # make the html pages. 
+        [psa._create_html_page(f) for f in filenames]
         # go to frontend
         psf
+
 if __name__ == '__main__':
     cli()
