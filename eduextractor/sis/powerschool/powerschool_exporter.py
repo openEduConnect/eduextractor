@@ -105,7 +105,6 @@ class PowerSchoolAdmin():
                 + '/powerschool-sys-mgmt/custompages/publishCustomPageContent.action',
                 cookies = cookies,
                 data = payload)
-        print r.content
         return r
 
     def _convert_cookies(self):
@@ -127,9 +126,8 @@ class PowerSchoolAdmin():
                 '/powerschool-sys-mgmt/custompages/builtintext.action?LoadFolderInfo=false&path=/admin/eduextractor/'+ 
                 page_name, 
                 cookies = self._convert_cookies())
-        print r.json()
-        return r.json()['customContentId']
-
+        id = r.json()['activeCustomContentId']
+        return id
 if __name__ == '__main__':
     psa = PowerSchoolAdmin()
     psa.login()
