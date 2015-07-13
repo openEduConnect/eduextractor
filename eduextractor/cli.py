@@ -47,7 +47,7 @@ def cli(sis, io):
             psa._publish_custom_page(page_name, content)
 
         # go to frontend
-        psf
+        psf.login()
 
 if __name__ == '__main__':
     cli()
