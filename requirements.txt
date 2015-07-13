@@ -6,3 +6,4 @@ PyYAML
 requests
 selenium
 six
+click

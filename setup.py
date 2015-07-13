@@ -74,8 +74,14 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['pandas','selenium','pyyaml'],
+    install_requires=['pandas', 'selenium', 'pyyaml', 
+                      'requests', 'click'],
 
+    # Entry points for command line integration
+    entry_points="""
+    [console_scripts]
+    eduextractor=eduextractor.cli:cli
+    """,
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
     # for example:
