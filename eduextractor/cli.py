@@ -25,10 +25,6 @@ def cli(sis, io):
         
         # Now let's prep our queries and files
         sql_queries = os.listdir('./eduextractor/sis/powerschool/sql/')
-        filenames = [f.replace('.sql', '.html') for f in sql_queries]
-        
-        # make the html pages. 
-        [psa._create_html_page(f) for f in filenames]
         
         # Okay, Content time
         top_file = open('./eduextractor/sis/powerschool/html/top.html',
@@ -40,13 +36,13 @@ def cli(sis, io):
         
         for query in sql_queries:
             page_name = query.replace('.sql', '.html')
+            psa._create_html_page(page_name)
             query_content_f = open('./eduextractor/sis/powerschool/sql/' + 
                                    query, 'r')
             query_content = query_content_f.read()
             content = top + query_content + bottom
-            print content
             psa._publish_custom_page(page_name, content)
-
+        
         # go to frontend
         psf.login()
 
