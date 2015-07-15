@@ -113,6 +113,7 @@ class PowerSchoolAdmin():
     def _publish_custom_page(self, page_name, content):
         """uploads a html file to the given location
         """
+        print page_name
         cookies = self._convert_cookies()
         payload = {'customContent': content,
                    'keyPath': "admin_eduextractor." +
