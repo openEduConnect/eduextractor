@@ -5,6 +5,7 @@ from selenium.common.exceptions import NoSuchElementException
 from urlparse import urlparse
 import requests
 
+
 class PowerSchoolFrontend():
     """A class, representing a interface to the Powerschool frontend
     which most teachers/students/admins have access to. 
@@ -18,17 +19,27 @@ class PowerSchoolFrontend():
     except KeyError:
         print "Please check the configuration of your config file"
     dr = Driver().driver
+
     def login(self):
         """Go login to the Pearson site, in a browser window
         """
         self.dr.get(self.url + self.postfix)
-        ## Username and Password Fields
+        # Username and Password Fields
         field = self.dr.find_element_by_id('fieldPassword')
-        ## send the text with semicolon
+        # send the text with semicolon
         field.send_keys(self.username + ';' + self.password)
-        ## Submit button
+        # Submit button
         button = self.dr.find_element_by_id('btnEnter')
         button.click()
+    
+    def _download_html_table(self, page_name):
+        """
+        Gets the HTML table from teh page
+        and returns pd.DataFrame
+        """
+        self.dr.get(self.url + self.postfix + page_name)
+        return self.dr.find_element_by_id('eduextractor_t')
+
 
 class PowerSchoolAdmin():
     """A class, representing an interface to the backend of a powerschool
@@ -45,12 +56,13 @@ class PowerSchoolAdmin():
     except KeyError:
         print "Please check the configuration of your config file"
     dr = Driver().driver
-    o = urlparse (url + postfix)
+    o = urlparse(url + postfix)
+
     def login(self):
         """Runs the login flow
         """
         self.dr.get(self.url + self.postfix)
-        #find the username, pw fields
+        # find the username, pw fields
         try:
             fuser = self.dr.find_element_by_id('j_username')
             fpw = self.dr.find_element_by_id('j_password')
@@ -63,19 +75,24 @@ class PowerSchoolAdmin():
         except NoSuchElementException: 
             # If no login element, then person is already logged in
             return  
+    
     def _go_to_custom_pages(self):
         self.dr.get(self.url + self.postfix + '/custompages/index.action')
+    
     def _add_eduextractor_folder(self):
         """Adds the custom folder /admin/eduextractor
         """
         cookies = self._convert_cookies()
         payload = {'newAssetName': 'eduextractor', 'newAssetPath': 'admin',
-                'newAssetType': 'folder'}
+                   'newAssetType': 'folder'}
         r = requests.post(self.o.scheme + '://' +
-                self.o.netloc + '/powerschool-sys-mgmt/custompages/createAsset.action'
-                ,cookies=cookies,
-                data = payload)
+                          self.o.netloc + 
+                          """/powerschool-sys-mgmt/
+                          custompages/createAsset.action""", 
+                          cookies=cookies,
+                          data=payload)
         return r
+
     def _create_html_page(self, page_name):
         """Creates an HTML file on powerschool 
         under /admin/eduextractor.  
@@ -84,12 +101,13 @@ class PowerSchoolAdmin():
         """
         cookies = self._convert_cookies()
         payload = {'newAssetName': page_name,
-                'newAssetPath': '/admin/eduextractor',
-                'newAssetType': 'file'}
+                   'newAssetPath': '/admin/eduextractor',
+                   'newAssetType': 'file'}
         r = requests.post(self.o.scheme + '://' + 
-                self.o.netloc + '/powerschool-sys-mgmt/custompages/createAsset.action',
-                cookies = cookies,
-                data = payload)
+                          self.o.netloc + """/powerschool-sys-mgmt/
+                          custompages/createAsset.action""",
+                          cookies=cookies,
+                          data=payload)
         return r
 
     def _publish_custom_page(self, page_name, content):
@@ -97,13 +115,15 @@ class PowerSchoolAdmin():
         """
         cookies = self._convert_cookies()
         payload = {'customContent': content,
-                'keyPath': "admin_eduextractor." + page_name.replace('.html',''),
-                'customContentId': self._get_custom_content_id(page_name),
-                'customContentPath': "/admin/eduextractor/" + page_name}
+                   'keyPath': "admin_eduextractor." +
+                   page_name.replace('.html', ''),
+                   'customContentId': self._get_custom_content_id(page_name),
+                   'customContentPath': "/admin/eduextractor/" + page_name}
         r = requests.post(self.o.scheme + '://' + self.o.netloc
-                + '/powerschool-sys-mgmt/custompages/publishCustomPageContent.action',
-                cookies = cookies,
-                data = payload)
+                          + """/powerschool-sys-mgmt/custompages/
+                          publishCustomPageContent.action""",
+                          cookies=cookies,
+                          data=payload)
         return r
 
     def _convert_cookies(self):
@@ -111,22 +131,25 @@ class PowerSchoolAdmin():
         request format. 
         """
         all_cookies = self.dr.get_cookies()
-        ## Convert cookies into request format
+        # Convert cookies into request format
         cookies = {}  
         for s_cookie in all_cookies:
-            cookies[s_cookie["name"]]=s_cookie["value"]
+            cookies[s_cookie["name"]] = s_cookie["value"]
         return cookies
 
-    def _get_custom_content_id(self,page_name):
+    def _get_custom_content_id(self, page_name):
         """give a page that exists in in /admin/eduextractor
         finds the PowerSchool Custom Content id. 
         """
         r = requests.get(self.o.scheme + "://" + self.o.netloc + 
-                '/powerschool-sys-mgmt/custompages/builtintext.action?LoadFolderInfo=false&path=/admin/eduextractor/'+ 
-                page_name, 
-                cookies = self._convert_cookies())
+                         """/powerschool-sys-mgmt/
+                         custompages/builtintext.action?
+                         LoadFolderInfo=false&path=/admin/eduextractor/""" + 
+                         page_name, 
+                         cookies=self._convert_cookies())
         id = r.json()['activeCustomContentId']
         return id
+
 if __name__ == '__main__':
     psa = PowerSchoolAdmin()
     psa.login()
