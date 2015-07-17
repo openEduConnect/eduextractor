@@ -1,6 +1,16 @@
 import click 
 from eduextractor.sis.powerschool import PowerSchoolAdmin, PowerSchoolFrontend
 import os
+import logging
+
+
+logger = logging.getLogger('eduextractor')
+# create console handler with a higher log level
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+fmt = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+ch.setFormatter(fmt)
+logger.addHandler(ch)
 
 
 @click.command()
@@ -14,6 +24,7 @@ def cli(sis, io):
     for now. 
     """
     if sis.lower() == 'powerschool':
+        logger.info("Beginging PowerSchool Export")
         psa = PowerSchoolAdmin()
         psf = PowerSchoolFrontend()
 
@@ -34,9 +45,20 @@ def cli(sis, io):
         top = top_file.read()
         bottom = bottom_file.read()
         
+        # Create the pages
         for query in sql_queries:
             page_name = query.replace('.sql', '.html')
+            logger.info("Creating page " + page_name)
             psa._create_html_page(page_name)
+            logger.info("Page " + page_name + " created.")
+
+        # waiting for publishing
+        prompt = "Please click Publish on every new page in /eduextractor. Y/n"
+        pub_status = raw_input(prompt)
+        if not pub_status:
+            logger.error("You haven't published anything yet. ")
+        for query in sql_queries:
+
             query_content_f = open('./eduextractor/sis/powerschool/sql/' + 
                                    query, 'r')
             query_content = query_content_f.read()

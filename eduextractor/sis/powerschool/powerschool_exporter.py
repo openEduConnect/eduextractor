@@ -87,8 +87,7 @@ class PowerSchoolAdmin():
                    'newAssetType': 'folder'}
         r = requests.post(self.o.scheme + '://' +
                           self.o.netloc + 
-                          """/powerschool-sys-mgmt/
-                          custompages/createAsset.action""", 
+                          """/powerschool-sys-mgmt/custompages/createAsset.action""", 
                           cookies=cookies,
                           data=payload)
         return r
@@ -104,8 +103,7 @@ class PowerSchoolAdmin():
                    'newAssetPath': '/admin/eduextractor',
                    'newAssetType': 'file'}
         r = requests.post(self.o.scheme + '://' + 
-                          self.o.netloc + """/powerschool-sys-mgmt/
-                          custompages/createAsset.action""",
+                          self.o.netloc + """/powerschool-sys-mgmt/custompages/createAsset.action""",
                           cookies=cookies,
                           data=payload)
         return r
@@ -121,8 +119,7 @@ class PowerSchoolAdmin():
                    'customContentId': self._get_custom_content_id(page_name),
                    'customContentPath': "/admin/eduextractor/" + page_name}
         r = requests.post(self.o.scheme + '://' + self.o.netloc
-                          + """/powerschool-sys-mgmt/custompages/
-                          publishCustomPageContent.action""",
+                          + """/powerschool-sys-mgmt/custompages/publishCustomPageContent.action""",
                           cookies=cookies,
                           data=payload)
         return r
@@ -143,9 +140,7 @@ class PowerSchoolAdmin():
         finds the PowerSchool Custom Content id. 
         """
         r = requests.get(self.o.scheme + "://" + self.o.netloc + 
-                         """/powerschool-sys-mgmt/
-                         custompages/builtintext.action?
-                         LoadFolderInfo=false&path=/admin/eduextractor/""" + 
+                         """/powerschool-sys-mgmt/custompages/builtintext.action?LoadFolderInfo=false&path=/admin/eduextractor/""" + 
                          page_name, 
                          cookies=self._convert_cookies())
         id = r.json()['activeCustomContentId']
