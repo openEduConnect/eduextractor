@@ -3,7 +3,6 @@ from eduextractor.sis.powerschool import PowerSchoolAdmin, PowerSchoolFrontend
 import os
 import logging
 
-
 logger = logging.getLogger('eduextractor')
 # create console handler with a higher log level
 ch = logging.StreamHandler()
@@ -58,15 +57,20 @@ def cli(sis, io):
         if not pub_status:
             logger.error("You haven't published anything yet. ")
         for query in sql_queries:
-
+            page_name = query.replace('.sql', '.html')
             query_content_f = open('./eduextractor/sis/powerschool/sql/' + 
                                    query, 'r')
             query_content = query_content_f.read()
             content = top + query_content + bottom
             psa._publish_custom_page(page_name, content)
-        
+
         # go to frontend
         psf.login()
+        logger.info('Downloading tables')
+        for query in sql_queries:
+            page_name = query.replace('.sql', '.html')
+            df = psf._download_html_table(page_name)
+            print df 
 
 if __name__ == '__main__':
     cli()

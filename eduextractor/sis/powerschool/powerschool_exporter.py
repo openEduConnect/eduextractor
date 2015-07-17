@@ -1,6 +1,6 @@
 from eduextractor.config import secrets
 from eduextractor.browser import Driver
-
+import pandas as pd
 from selenium.common.exceptions import NoSuchElementException
 from urlparse import urlparse
 import requests
@@ -145,16 +145,3 @@ class PowerSchoolAdmin():
                          cookies=self._convert_cookies())
         id = r.json()['activeCustomContentId']
         return id
-
-if __name__ == '__main__':
-    psa = PowerSchoolAdmin()
-    psa.login()
-    psa._go_to_custom_pages()
-    psa._add_eduextractor_folder()
-# ask for the specific table
-
-# download table
-
-# normalize names
-
-
