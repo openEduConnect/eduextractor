@@ -37,7 +37,7 @@ class PowerSchoolFrontend():
         Gets the HTML table from teh page
         and returns pd.DataFrame
         """
-        self.dr.get(self.url + self.postfix + page_name)
+        self.dr.get(self.url + self.postfix + "/eduextractor/" + page_name)
         return self.dr.find_element_by_id('eduextractor_t')
 
 
