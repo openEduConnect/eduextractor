@@ -38,8 +38,9 @@ class PowerSchoolFrontend():
         and returns pd.DataFrame
         """
         self.dr.get(self.url + self.postfix + "/eduextractor/" + page_name)
-        return self.dr.find_element_by_id('eduextractor_t')
-
+        elem = self.dr.find_element_by_id('eduextractor_t')
+        df = pd.read_html(elem.text)
+        return df
 
 class PowerSchoolAdmin():
     """A class, representing an interface to the backend of a powerschool
