@@ -47,8 +47,6 @@ setup(
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
-        'Topic :: Software Development :: Interfactes',
-        'Topic :: Education'
 
         # Pick your license as you wish (should match "license" above)
         'License :: OSI Approved :: MIT License',
