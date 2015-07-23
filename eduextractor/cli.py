@@ -70,7 +70,7 @@ def cli(sis, io):
         for query in sql_queries:
             page_name = query.replace('.sql', '.html')
             df = psf._download_html_table(page_name)
-            print df 
+            df.to_csv('/tmp/' + query + '.csv')
 
 if __name__ == '__main__':
     cli()
