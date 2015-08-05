@@ -25,9 +25,11 @@ class PowerSchoolFrontend():
         """
         self.dr.get(self.url + self.postfix)
         # Username and Password Fields
-        field = self.dr.find_element_by_id('fieldPassword')
-        # send the text with semicolon
-        field.send_keys(self.username + ';' + self.password)
+        us_field = self.dr.find_element_by_id('fieldUsername')
+        pw_field = self.dr.find_element_by_id('fieldPassword')
+        # send the text
+        us_field.send_keys(self.username)
+        pw_field.send_keys(self.password)
         # Submit button
         button = self.dr.find_element_by_id('btnEnter')
         button.click()
