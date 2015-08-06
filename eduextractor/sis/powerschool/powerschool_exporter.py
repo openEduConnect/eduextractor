@@ -25,8 +25,13 @@ class PowerSchoolFrontend():
         """
         self.dr.get(self.url + self.postfix)
         # Username and Password Fields
-        us_field = self.dr.find_element_by_id('fieldUsername')
-        pw_field = self.dr.find_element_by_id('fieldPassword')
+        
+        try:
+            us_field = self.dr.find_element_by_id('fieldUsername')
+            pw_field = self.dr.find_element_by_id('fieldPassword')
+        except NoSuchElementException:
+            print "already logged in"
+            return
         # send the text
         us_field.send_keys(self.username)
         pw_field.send_keys(self.password)
@@ -39,10 +44,18 @@ class PowerSchoolFrontend():
         Gets the HTML table from teh page
         and returns pd.DataFrame
         """
+        from selenium.webdriver.common.by import By
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
         self.dr.get(self.url + self.postfix + "/eduextractor/" + page_name)
-        elem = self.dr.find_element_by_id('eduextractor_t')
-        df = pd.read_html(elem.text)
-        return df
+        try:
+            elem = WebDriverWait(self.dr, 150).until(
+                    EC.presence_of_element_located((By.ID,'eduextractor_t'))
+                    )
+        except selenium.exceptions.TimeOutException:
+            raise "Timeout Problem"
+        return pd.read_html(self.dr.page_source)
+
 
 class PowerSchoolAdmin():
     """A class, representing an interface to the backend of a powerschool
