@@ -67,10 +67,6 @@ def cli(sis, io):
         # go to frontend
         psf.login()
         logger.info('Downloading tables')
-        for query in sql_queries:
-            page_name = query.replace('.sql', '.html')
-            df = psf._download_html_table(page_name)
-            df.to_csv('/tmp/' + query + '.csv')
-
+        psf._download_csvs_to_tmp()
 if __name__ == '__main__':
     cli()

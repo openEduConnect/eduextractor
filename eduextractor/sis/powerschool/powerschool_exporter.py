@@ -4,6 +4,7 @@ import pandas as pd
 from selenium.common.exceptions import NoSuchElementException
 from urlparse import urlparse
 import requests
+import os
 
 
 class PowerSchoolFrontend():
@@ -52,11 +53,19 @@ class PowerSchoolFrontend():
             elem = WebDriverWait(self.dr, 150).until(
                     EC.presence_of_element_located((By.ID,'eduextractor_t'))
                     )
-        except selenium.exceptions.TimeOutException:
+        except TimeOutException:
             raise "Timeout Problem"
-        return pd.read_html(self.dr.page_source)
+        return pd.read_html(self.dr.page_source)[0]
 
 
+    def _download_csvs_to_tmp(self):
+        queries = os.listdir('eduextractor/sis/powerschool/sql')
+        for query in queries:
+            page_name = query.replace('.sql','.html')
+            df = self._download_html_table(page_name)
+            print "Downloading %s" % query
+            df.to_csv('/tmp/' + page_name.replace('.html','.csv'))
+            
 class PowerSchoolAdmin():
     """A class, representing an interface to the backend of a powerschool
     installation. This backend typically has few users, but allows us to 
