@@ -74,8 +74,10 @@ def cli(sis, io, data):
                 logger.info('Downloading tables')
                 psf._download_csvs_to_tmp()
             elif data:
-                valid_fields = os.listdir("./eduextractor/sis/powerschool/sql").replace('.sql', '')
-                if data.lower in valid_fields:
+                valid_fields = os.listdir("./eduextractor/sis/powerschool/sql")
+                valid_fields = [x.replace('.sql', '') for x in valid_fields]
+                if data.lower() in valid_fields:
+                    print "Downloading %s" % data.lower()
                     psf.login()
                     psf._download_html_table(data.lower() + 
                                              '.html').to_csv('/tmp/' 
