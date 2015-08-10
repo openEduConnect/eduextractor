@@ -7,3 +7,4 @@ requests
 selenium
 six
 click
+sphinx

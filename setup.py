@@ -73,7 +73,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=['pandas', 'selenium', 'pyyaml', 
-                      'requests', 'click'],
+                      'requests', 'click', 'sphinx'],
 
     # Entry points for command line integration
     entry_points="""
