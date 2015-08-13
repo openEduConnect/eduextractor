@@ -83,6 +83,8 @@ def cli(sis, io, data):
                                              '.html').to_csv('/tmp/' 
                                                              + data.lower() 
                                                              + '.csv')
+            else:
+                raise Exception("Table Not Found")
 
 
 if __name__ == '__main__':
