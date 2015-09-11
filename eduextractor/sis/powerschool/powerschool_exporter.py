@@ -5,7 +5,7 @@ from selenium.common.exceptions import NoSuchElementException
 from urlparse import urlparse
 import requests
 import os
-
+import warnings
 
 class PowerSchoolFrontend():
     """A class, representing a interface to the Powerschool frontend
@@ -61,7 +61,10 @@ class PowerSchoolFrontend():
     def _download_csvs_to_tmp(self):
         queries = os.listdir('eduextractor/sis/powerschool/sql')
         for query in queries:
-            page_name = query.replace('.sql','.html')
+            page_name = query.replace('.sql', '.html')
+            if page_name == "attendance.html":
+                warnings.warn("Attendance not yet implemented")
+                continue
             df = self._download_html_table(page_name)
             print "Downloading %s" % query
             df.to_csv('/tmp/' + page_name.replace('.html','.csv'))
