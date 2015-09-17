@@ -15,7 +15,8 @@ def load_map_files():
     r = requests.get(cdf_url, auth=(NWEA_USERNAME, NWEA_PASSWORD))
 
     print r.reason
-# if the request is successful...
+# if the request is successful..
+    df_list = []
     if r.status_code == 200:
         print 'Downloading CDF...'
         # convert the response content into a zipfile
@@ -28,9 +29,10 @@ def load_map_files():
             cdf = z.open(f)
 
             # read into dataframe
-            df = pd.read_csv(cdf)        
-            df.to_csv('/tmp/map.csv')
-    print 'Done!'
+            df = pd.read_csv(cdf)
+            df_list.append(df)
+        whole_df = pd.concat(df_list)
+        whole_df.to_csv('/tmp/map.csv')
 
 if __name__ == '__main__':
     load_map_files()
