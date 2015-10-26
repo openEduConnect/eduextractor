@@ -64,10 +64,10 @@ class PowerSchoolFrontend():
             page_name = query.replace('.sql', '.html')
             if page_name == "attendance.html":
                 warnings.warn("Attendance not yet implemented")
-                continue
-            df = self._download_html_table(page_name)
-            print "Downloading %s" % query
-            df.to_csv('/tmp/' + page_name.replace('.html','.csv'))
+            else:
+                df = self._download_html_table(page_name)
+                print "Downloading %s" % query
+                df.to_csv('/tmp/' + page_name.replace('.html','.csv'))
             
 class PowerSchoolAdmin():
     """A class, representing an interface to the backend of a powerschool
