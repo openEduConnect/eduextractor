@@ -1,9 +1,13 @@
-import click 
+import click
 from eduextractor.sis.powerschool import PowerSchoolAdmin, PowerSchoolFrontend
 import os
 import logging
+from .config import _load_secrets
+
+from pkg_resources import resource_stream
 
 logger = logging.getLogger('eduextractor')
+
 # create console handler with a higher log level
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
@@ -13,44 +17,55 @@ logger.addHandler(ch)
 
 
 @click.command()
-@click.option('--sis', default='powerschool', 
+@click.option('--sis', default='powerschool',
               help='which SIS extractor to use')
-@click.option('--io', default='extract', 
-              help='Do you want to extract, import do both.')
+@click.option('--io', default='extract',
+              help="""'extract' or 'download'""")
 @click.option('--data', default='all',
-              help="""Which file/query do you want to extract. 
-              Defaults to all.""")
-def cli(sis, io, data):
+              help="""Which file/query do you want to extract.  Defaults to 'all'.""")
+@click.option('--config', default=None,
+              help="""Location of the config file""")
+def cli(sis, io, data, config):
     """
     The CLI inteface. Just powerschool extracts
-    for now. 
+    for now.
     """
+    secrets = _load_secrets(config)
+
     if sis.lower() == 'powerschool':
-        psa = PowerSchoolAdmin()
-        psf = PowerSchoolFrontend()
+        psa = PowerSchoolAdmin(secrets)
+        psf = PowerSchoolFrontend(secrets)
+
+        sql_filenames = [
+            "adhoc_studentemail.sql",
+            "attendance.sql",
+            "enrollments.sql",
+            "grades.sql",
+            "schools.sql",
+            "students.sql",
+            "k12studentenrollment.sql"
+        ]
+
         if io.lower() == 'extract':
             logger.info("Beginging PowerSchool Export")
 
-            # Login to Admin, upload HTML 
+            # Login to Admin, upload HTML
             psa.login()
             psa._go_to_custom_pages()
             # ps doesn't error if folder exists, so fine to run everytime
-            psa._add_eduextractor_folder() 
-            
+            psa._add_eduextractor_folder()
+
             # Now let's prep our queries and files
-            sql_queries = os.listdir('./eduextractor/sis/powerschool/sql/')
-            
+
             # Okay, Content time
-            top_file = open('./eduextractor/sis/powerschool/html/top.html',
-                            'r')
-            bottom_file = open("./eduextractor/sis/powerschool/html/bottom.html",
-                               'r')
-            top = top_file.read()
-            bottom = bottom_file.read()
-            
+            with resource_stream('eduextractor.sis.powerschool.html', 'top.html') as f:
+                top = f.read()
+            with resource_stream('eduextractor.sis.powerschool.html', 'bottom.html') as f:
+                bottom = f.read()
+
             # Create the pages
-            for query in sql_queries:
-                page_name = query.replace('.sql', '.html')
+            for sql_filename in sql_filenames:
+                page_name = sql_filename.replace('.sql', '.html')
                 logger.info("Creating page " + page_name)
                 psa._create_html_page(page_name)
                 logger.info("Page " + page_name + " created.")
@@ -58,15 +73,18 @@ def cli(sis, io, data):
             # waiting for publishing
             prompt = "Please click Publish on every new page in /eduextractor."
             pub_status = raw_input(prompt)
+
             if not pub_status:
                 logger.error("You haven't published anything yet. ")
             for query in sql_queries:
                 page_name = query.replace('.sql', '.html')
-                query_content_f = open('./eduextractor/sis/powerschool/sql/' + 
-                                       query, 'r')
-                query_content = query_content_f.read()
+
+                with open('./eduextractor/sis/powerschool/sql/' + query, 'r') as f:
+                    query_content = f.read()
+
                 content = top + query_content + bottom
                 psa._publish_custom_page(page_name, content)
+
         elif io.lower() == 'download':
             if data.lower() == 'all':
                 # go to frontend
@@ -74,14 +92,13 @@ def cli(sis, io, data):
                 logger.info('Downloading tables')
                 psf._download_csvs_to_tmp()
             elif data:
-                valid_fields = os.listdir("./eduextractor/sis/powerschool/sql")
-                valid_fields = [x.replace('.sql', '') for x in valid_fields]
+                valid_fields = [x.replace('.sql', '') for x in sql_filenames]
                 if data.lower() in valid_fields:
-                    print "Downloading %s" % data.lower()
+                    print("Downloading %s" % data.lower())
                     psf.login()
-                    psf._download_html_table(data.lower() + 
-                                             '.html').to_csv('/tmp/' 
-                                                             + data.lower() 
+                    psf._download_html_table(data.lower() +
+                                             '.html').to_csv('/tmp/'
+                                                             + data.lower()
                                                              + '.csv')
             else:
                 raise Exception("Table Not Found")
