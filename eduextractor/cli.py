@@ -2,7 +2,9 @@ import click
 from eduextractor.sis.powerschool import PowerSchoolAdmin, PowerSchoolFrontend
 import os
 import logging
-from config import _load_secrets
+from .config import _load_secrets
+
+from pkg_resources import resource_stream
 
 logger = logging.getLogger('eduextractor')
 
@@ -21,7 +23,7 @@ logger.addHandler(ch)
               help="""'extract' or 'download'""")
 @click.option('--data', default='all',
               help="""Which file/query do you want to extract.  Defaults to 'all'.""")
-@click.option('--config', default=None),
+@click.option('--config', default=None,
               help="""Location of the config file""")
 def cli(sis, io, data, config):
     """
@@ -33,6 +35,17 @@ def cli(sis, io, data, config):
     if sis.lower() == 'powerschool':
         psa = PowerSchoolAdmin(secrets)
         psf = PowerSchoolFrontend(secrets)
+
+        sql_filenames = [
+            "adhoc_studentemail.sql",
+            "attendance.sql",
+            "enrollments.sql",
+            "grades.sql",
+            "schools.sql",
+            "students.sql",
+            "k12studentenrollment.sql"
+        ]
+
         if io.lower() == 'extract':
             logger.info("Beginging PowerSchool Export")
 
@@ -43,17 +56,16 @@ def cli(sis, io, data, config):
             psa._add_eduextractor_folder()
 
             # Now let's prep our queries and files
-            sql_queries = os.listdir('./eduextractor/sis/powerschool/sql/')
 
             # Okay, Content time
-            with open('./eduextractor/sis/powerschool/html/top.html', 'r') as f:
+            with resource_stream('eduextractor.sis.powerschool.html', 'top.html') as f:
                 top = f.read()
-            with open("./eduextractor/sis/powerschool/html/bottom.html", 'r') as f:
+            with resource_stream('eduextractor.sis.powerschool.html', 'bottom.html') as f:
                 bottom = f.read()
 
             # Create the pages
-            for query in sql_queries:
-                page_name = query.replace('.sql', '.html')
+            for sql_filename in sql_filenames:
+                page_name = sql_filename.replace('.sql', '.html')
                 logger.info("Creating page " + page_name)
                 psa._create_html_page(page_name)
                 logger.info("Page " + page_name + " created.")
@@ -80,10 +92,9 @@ def cli(sis, io, data, config):
                 logger.info('Downloading tables')
                 psf._download_csvs_to_tmp()
             elif data:
-                valid_fields = os.listdir("./eduextractor/sis/powerschool/sql")
-                valid_fields = [x.replace('.sql', '') for x in valid_fields]
+                valid_fields = [x.replace('.sql', '') for x in sql_filenames]
                 if data.lower() in valid_fields:
-                    print "Downloading %s" % data.lower()
+                    print("Downloading %s" % data.lower())
                     psf.login()
                     psf._download_html_table(data.lower() +
                                              '.html').to_csv('/tmp/'

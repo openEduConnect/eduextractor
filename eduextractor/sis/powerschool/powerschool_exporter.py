@@ -1,11 +1,11 @@
 from eduextractor.browser import Driver
 import pandas as pd
 from selenium.common.exceptions import NoSuchElementException
-from urlparse import urlparse
+from six.moves.urllib_parse import urlparse
 import requests
 import os
 import warnings
-from config import _load_secrets
+from ...config import _load_secrets
 
 class PowerSchoolFrontend():
     """A class, representing a interface to the Powerschool frontend
@@ -16,13 +16,13 @@ class PowerSchoolFrontend():
         if secrets is None:
             secrets = _load_secrets()
         try:
-            self.SECRETS = secrets['powerschool']['frontend']
+            SECRETS = secrets['powerschool']['frontend']
             self.username = SECRETS['username']
             self.password = SECRETS['password']
             self.url = SECRETS['url']
             self.postfix = SECRETS['postfix']
         except KeyError:
-            print "Please check the configuration of your config file"
+            print("Please check the configuration of your config file")
         self.dr = Driver().driver
 
     def login(self):
@@ -35,7 +35,7 @@ class PowerSchoolFrontend():
             us_field = self.dr.find_element_by_id('fieldUsername')
             pw_field = self.dr.find_element_by_id('fieldPassword')
         except NoSuchElementException:
-            print "already logged in"
+            print("already logged in")
             return
 
         # send the text
@@ -71,7 +71,7 @@ class PowerSchoolFrontend():
                 warnings.warn("Attendance not yet implemented")
             else:
                 df = self._download_html_table(page_name)
-                print "Downloading %s" % query
+                print("Downloading %s" % query)
                 df.to_csv('/tmp/' + page_name.replace('.html','.csv'))
 
 class PowerSchoolAdmin():
@@ -86,15 +86,15 @@ class PowerSchoolAdmin():
             secrets = _load_secrets()
 
         try:
-            self.SECRETS = secrets['powerschool']['admin']
+            SECRETS = secrets['powerschool']['admin']
             self.username = SECRETS['username']
             self.password = SECRETS['password']
             self.postfix = SECRETS['postfix']
             self.url = secrets['powerschool']['frontend']['url']
         except KeyError:
-            print "Please check the configuration of your config file"
+            print("Please check the configuration of your config file")
         self.dr = Driver().driver
-        self.o = urlparse(url + postfix)
+        self.o = urlparse(self.url + self.postfix)
 
     def login(self):
         """Runs the login flow
@@ -152,7 +152,7 @@ class PowerSchoolAdmin():
     def _publish_custom_page(self, page_name, content):
         """uploads a html file to the given location
         """
-        print page_name
+        print(page_name)
         cookies = self._convert_cookies()
         payload = {'customContent': content,
                    'keyPath': "admin_eduextractor." +

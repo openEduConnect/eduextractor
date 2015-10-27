@@ -14,4 +14,4 @@ def _load_secrets(path=None):
         data_map = yaml.safe_load(f)
     return data_map
 
-secrets = _load_secrets(config_path = os.environ.get('EDUEXTRACTOR_CONFIG'))
+secrets = _load_secrets(os.environ.get('EDUEXTRACTOR_CONFIG'))
