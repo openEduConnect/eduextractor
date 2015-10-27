@@ -3,6 +3,7 @@ from eduextractor.sis.powerschool import PowerSchoolAdmin, PowerSchoolFrontend
 import os
 import logging
 from .config import _load_secrets
+from six.moves import input
 
 from pkg_resources import resource_stream
 
@@ -72,14 +73,15 @@ def cli(sis, io, data, config):
 
             # waiting for publishing
             prompt = "Please click Publish on every new page in /eduextractor."
-            pub_status = raw_input(prompt)
+            pub_status = input(prompt)
 
             if not pub_status:
                 logger.error("You haven't published anything yet. ")
-            for query in sql_queries:
-                page_name = query.replace('.sql', '.html')
 
-                with open('./eduextractor/sis/powerschool/sql/' + query, 'r') as f:
+            for sql_filename in sql_filenames:
+                page_name = sql_filename.replace('.sql', '.html')
+
+                with resource_stream('eduextractor.sis.powerschool.sql', sql_filename) as f:
                     query_content = f.read()
 
                 content = top + query_content + bottom
