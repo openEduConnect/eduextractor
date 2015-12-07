@@ -1,1 +1,1 @@
-from powerschool_exporter import *
+from .powerschool_exporter import *
