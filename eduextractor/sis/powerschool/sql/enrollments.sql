@@ -12,7 +12,6 @@ SELECT cc.studentid,
 FROM cc
 JOIN students s
   ON cc.studentid = s.id
- AND s.enroll_status = 0
 JOIN sections sect
   ON abs(cc.sectionid) = sect.ID
 JOIN courses c

@@ -6,7 +6,7 @@ SELECT s.id,
        s.dob
 FROM students s
 --0 indicates currently enrolled students in PowerSchool
-WHERE s.enroll_status = 0;alternatecolor]
+;alternatecolor]
 
 <tr class="oddrow" >
 	<td><font size="1.5">          ~(id;1)           </font>           </td>

@@ -5,8 +5,7 @@ SELECT e.studentid,
        e.exitdate
 FROM ps_enrollment e
 JOIN students s
-  ON e.studentid = s.ID
- AND s.enroll_status = 0;alternatecolor]
+  ON e.studentid = s.ID;alternatecolor]
 
 <tr class="oddrow" >
 	<td><font size="1.5">          ~(studentid;1)           </font>           </td>

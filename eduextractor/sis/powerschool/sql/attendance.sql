@@ -5,8 +5,7 @@ SELECT a.studentid,
 	   a.presence_status_cd
 FROM ps_attendance_daily a
 JOIN students s
-  ON a.studentid = s.id
- AND s.enroll_status = 0;alternatecolor]
+  ON a.studentid = s.id;alternatecolor]
 
 <tr class="oddrow" >
 	<td><font size="1.5">          ~(id;1)           </font>           </td>
