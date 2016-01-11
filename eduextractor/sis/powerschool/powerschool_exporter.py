@@ -1,188 +1,31 @@
-from eduextractor.browser import Driver
 import pandas as pd
-from selenium.common.exceptions import NoSuchElementException
-from six.moves.urllib_parse import urlparse
-import requests
-import os
-import warnings
 from ...config import _load_secrets
+import sqlalchemy
 
-class PowerSchoolFrontend():
+class PowerSchoolSQLInferface: 
     """A class, representing a interface to the Powerschool frontend
     which most teachers/students/admins have access to.
     """
-
     def __init__(self, secrets=None):
         if secrets is None:
             secrets = _load_secrets()
         try:
-            SECRETS = secrets['powerschool']['frontend']
+            SECRETS = secrets['powerschool']
             self.username = SECRETS['username']
             self.password = SECRETS['password']
-            self.url = SECRETS['url']
-            self.postfix = SECRETS['postfix']
+            self.host = SECRETS['host']
+            self.dbname = SECRETS['dbname']
         except KeyError:
             print("Please check the configuration of your config file")
-        self.dr = Driver().driver
 
-    def login(self):
-        """Go login to the Pearson site, in a browser window
-        """
-        self.dr.get(self.url + self.postfix)
-
-        # Username and Password Fields
-        try:
-            us_field = self.dr.find_element_by_id('fieldUsername')
-            pw_field = self.dr.find_element_by_id('fieldPassword')
-        except NoSuchElementException:
-            print("already logged in")
-            return
-
-        # send the text
-        us_field.send_keys(self.username)
-        pw_field.send_keys(self.password)
-        # Submit button
-        button = self.dr.find_element_by_id('btnEnter')
-        button.click()
-
-    def _download_html_table(self, page_name):
-        """
-        Gets the HTML table from teh page
-        and returns pd.DataFrame
-        """
-        from selenium.webdriver.common.by import By
-        from selenium.webdriver.support.ui import WebDriverWait
-        from selenium.webdriver.support import expected_conditions as EC
-        self.dr.get(self.url + self.postfix + "/eduextractor/" + page_name)
-        try:
-            elem = WebDriverWait(self.dr, 150).until(
-                    EC.presence_of_element_located((By.ID,'eduextractor_t'))
-                    )
-        except TimeOutException:
-            raise "Timeout Problem"
-        return pd.read_html(self.dr.page_source)[0]
-
-
-    def _download_csvs_to_tmp(self):
-        queries = os.listdir('eduextractor/sis/powerschool/sql')
-        for query in queries:
-            page_name = query.replace('.sql', '.html')
-            if page_name == "attendance.html":
-                warnings.warn("Attendance not yet implemented")
-            else:
-                df = self._download_html_table(page_name)
-                print("Downloading %s" % query)
-                df.to_csv('/tmp/' + page_name.replace('.html','.csv'))
-
-class PowerSchoolAdmin():
-    """A class, representing an interface to the backend of a powerschool
-    installation. This backend typically has few users, but allows us to
-    upload html pages that expose ts_sql (the custom variant of SQL that
-    powerschool uses and allows HTML injection of.)
-    """
-
-    def __init__(self, secrets=None):
-        if secrets is None:
-            secrets = _load_secrets()
-
-        try:
-            SECRETS = secrets['powerschool']['admin']
-            self.username = SECRETS['username']
-            self.password = SECRETS['password']
-            self.postfix = SECRETS['postfix']
-            self.url = secrets['powerschool']['frontend']['url']
-        except KeyError:
-            print("Please check the configuration of your config file")
-        self.dr = Driver().driver
-        self.o = urlparse(self.url + self.postfix)
-
-    def login(self):
-        """Runs the login flow
-        """
-        self.dr.get(self.url + self.postfix)
-
-        # find the username, pw fields
-        try:
-            fuser = self.dr.find_element_by_id('j_username')
-            fpw = self.dr.find_element_by_id('j_password')
-
-            # send the keys
-            fuser.send_keys(self.username)
-            fpw.send_keys(self.password)
-
-            # Click the button!
-            button = self.dr.find_element_by_id('loginsubmit')
-            button.click()
-        except NoSuchElementException:
-            # If no login element, then person is already logged in
-            return
-
-    def _go_to_custom_pages(self):
-        self.dr.get(self.url + self.postfix + '/custompages/index.action')
-
-    def _add_eduextractor_folder(self):
-        """Adds the custom folder /admin/eduextractor
-        """
-        cookies = self._convert_cookies()
-        payload = {'newAssetName': 'eduextractor', 'newAssetPath': 'admin',
-                   'newAssetType': 'folder'}
-        r = requests.post(self.o.scheme + '://' +
-                          self.o.netloc +
-                          """/powerschool-sys-mgmt/custompages/createAsset.action""",
-                          cookies=cookies,
-                          data=payload)
-        return r
-
-    def _create_html_page(self, page_name):
-        """Creates an HTML file on powerschool
-        under /admin/eduextractor.
-
-        usage: psa._upload_html('test.html')
-        """
-        cookies = self._convert_cookies()
-        payload = {'newAssetName': page_name,
-                   'newAssetPath': '/admin/eduextractor',
-                   'newAssetType': 'file'}
-        r = requests.post(self.o.scheme + '://' +
-                          self.o.netloc + """/powerschool-sys-mgmt/custompages/createAsset.action""",
-                          cookies=cookies,
-                          data=payload)
-        return r
-
-    def _publish_custom_page(self, page_name, content):
-        """uploads a html file to the given location
-        """
-        print(page_name)
-        cookies = self._convert_cookies()
-        payload = {'customContent': content,
-                   'keyPath': "admin_eduextractor." +
-                   page_name.replace('.html', ''),
-                   'customContentId': self._get_custom_content_id(page_name),
-                   'customContentPath': "/admin/eduextractor/" + page_name}
-        r = requests.post(self.o.scheme + '://' + self.o.netloc
-                          + """/powerschool-sys-mgmt/custompages/publishCustomPageContent.action""",
-                          cookies=cookies,
-                          data=payload)
-        return r
-
-    def _convert_cookies(self):
-        """Converts the cookies from Selenium to
-        request format.
-        """
-        all_cookies = self.dr.get_cookies()
-        # Convert cookies into request format
-        cookies = {}
-        for s_cookie in all_cookies:
-            cookies[s_cookie["name"]] = s_cookie["value"]
-        return cookies
-
-    def _get_custom_content_id(self, page_name):
-        """give a page that exists in in /admin/eduextractor
-        finds the PowerSchool Custom Content id.
-        """
-        r = requests.get(self.o.scheme + "://" + self.o.netloc +
-                         """/powerschool-sys-mgmt/custompages/builtintext.action?LoadFolderInfo=false&path=/admin/eduextractor/""" +
-                         page_name,
-                         cookies=self._convert_cookies())
-        id = r.json()['activeCustomContentId']
-        return id
+        engine = sqlalchemy.create_engine('oracle://' + self.username + 
+                                          ':' + self.password + 
+                                          '@' + self.host + ':' +
+                                          self.port + '/' + 
+                                          self.dbname)
+        self.conn = engine.connect()
+    
+    def query_to_df(query):
+        """executes query, converts to pd.dataframe"""
+        df = pd.read_sql(query, conn)
+        return df
