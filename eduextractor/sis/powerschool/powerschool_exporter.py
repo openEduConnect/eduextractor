@@ -1,6 +1,8 @@
 import pandas as pd
 from ...config import _load_secrets
 import sqlalchemy
+import os 
+from tqdm import tqdm
 
 class PowerSchoolSQLInferface: 
     """A class, representing a interface to the Powerschool frontend
@@ -29,3 +31,19 @@ class PowerSchoolSQLInferface:
         """executes query, converts to pd.dataframe"""
         df = pd.read_sql(query, conn)
         return df
+
+    def _list_queries(file_dir='./sql'):
+        return os.listdir(file_dir)
+
+    def download_files():
+        files = self._list_queries()
+        for file_name in tqdm(files): 
+            with open('./sql/' + file_name, 'r') as filebuf:
+                data = filebuf.read()
+                df = query_to_df(data)
+                file_name = file_name.replace('.sql','.csv')
+                df.to_csv('tmp/' + file_name)
+
+if __name__ == '__main__':
+    PowerSchoolSQLInferface.download_files()
+    
