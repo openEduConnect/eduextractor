@@ -5,6 +5,9 @@ Extraction-Transformation Tools for Education Data.
 
 [Docs](http://eduextractor.readthedocs.org/en/latest/)
 
+## Installing cx_Oracle
+[Because you have to](https://gist.github.com/thom-nic/6011715)
+
 ## Supported Datasources
 * NWEA MAP Scores
 * Powerschool
