@@ -26,16 +26,16 @@ nwea_map:
 
 
 powerschool:
-  frontend:
-    username: username_for_ps_frontend 
-    password: pw_for_ps_frontend
-    url: your_powerschool_url
-    postfix: /admin 
-  admin:
-    username: custom_content_username
-    password: custom_content_password
-    postfix: /powerschool-sys-mgmt
+  host: 172.0.0.1
+  username: PS_Username
+  password: Your_PW
+  dbname: PSPRODDB (most likely)
 
+illuminate: 
+  host:
+  username:
+  password:
+  dbname:
 Once that is configured, run `eduextractor` on the command line with the various options to extract your data. 
 
 
