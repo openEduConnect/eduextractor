@@ -1,5 +1,6 @@
 import click
 from eduextractor.sis.powerschool.powerschool_exporter import PowerSchoolSQLInterface
+from eduextractor.sis.powerschool.illuminate_exporter import IlluminateSQLInterface
 import os
 import logging
 from .config import _load_secrets
@@ -34,6 +35,9 @@ def cli(sis, io, data, config):
 
     if sis.lower() == 'powerschool':
         interface = PowerSchoolSQLInterface()
+        interface.download_files()
+    if sis.lower() == 'illuminate':
+        interface = IlluminateSQLInterface()
         interface.download_files()
 
 if __name__ == '__main__':
