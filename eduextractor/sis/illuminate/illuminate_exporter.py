@@ -1,18 +1,19 @@
 import pandas as pd
 from ...config import _load_secrets
 import sqlalchemy
-import os 
+import os
 from tqdm import tqdm
 
-class PowerSchoolSQLInferface: 
-    """A class, representing a interface to the Powerschool frontend
-    which most teachers/students/admins have access to.
+
+class IlluminateSQLInterface:
+    """A class representing a SQL interface to 
+    Illuminate 
     """
     def __init__(self, secrets=None):
         if secrets is None:
             secrets = _load_secrets()
         try:
-            SECRETS = secrets['powerschool']
+            SECRETS = secrets['illuminate']
             self.username = SECRETS['username']
             self.password = SECRETS['password']
             self.host = SECRETS['host']
@@ -20,7 +21,7 @@ class PowerSchoolSQLInferface:
         except KeyError:
             print("Please check the configuration of your config file")
 
-        engine = sqlalchemy.create_engine('oracle://' + self.username + 
+        engine = sqlalchemy.create_engine('postgres://' + self.username + 
                                           ':' + self.password + 
                                           '@' + self.host + ':' +
                                           self.port + '/' + 
@@ -45,5 +46,5 @@ class PowerSchoolSQLInferface:
                 df.to_csv('/tmp/' + file_name)
 
 if __name__ == '__main__':
-    PowerSchoolSQLInferface.download_files()
+    IlluminateSQLInterface.download_files()
     
