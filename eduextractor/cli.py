@@ -1,5 +1,5 @@
 import click
-from eduextractor.sis.powerschool import PowerSchoolSQLInterface
+from eduextractor.sis.powerschool.powerschool_exporter import PowerSchoolSQLInterface
 import os
 import logging
 from .config import _load_secrets
