@@ -18,13 +18,14 @@ class IlluminateSQLInterface:
             self.password = SECRETS['password']
             self.host = SECRETS['host']
             self.dbname = SECRETS['dbname']
+            self.port = str(SECRETS['port']) 
         except KeyError:
             print("Please check the configuration of your config file")
 
         engine = sqlalchemy.create_engine('postgres://' + self.username + 
                                           ':' + self.password + 
                                           '@' + self.host + ':' +
-                                          "5432" + '/' + 
+                                          self.port + '/' + 
                                           self.dbname)
         self.conn = engine.connect()
     
