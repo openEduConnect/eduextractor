@@ -1,6 +1,8 @@
 import click
-from eduextractor.sis.powerschool.powerschool_exporter import PowerSchoolSQLInterface
-from eduextractor.sis.powerschool.illuminate_exporter import IlluminateSQLInterface
+import eduextractor.sis.powerschool.powerschool_exporter
+import eduextractor.sis.illuminate.illuminate_exporter
+from .sis.powerschool.powerschool_exporter import PowerSchoolSQLInterface
+from .sis.illuminate.illuminate_exporter import IlluminateSQLInterface
 import os
 import logging
 from .config import _load_secrets

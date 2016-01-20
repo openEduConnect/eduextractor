@@ -24,7 +24,7 @@ class IlluminateSQLInterface:
         engine = sqlalchemy.create_engine('postgres://' + self.username + 
                                           ':' + self.password + 
                                           '@' + self.host + ':' +
-                                          self.port + '/' + 
+                                          "5432" + '/' + 
                                           self.dbname)
         self.conn = engine.connect()
     

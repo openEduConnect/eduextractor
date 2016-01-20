@@ -4,7 +4,7 @@ import sqlalchemy
 import os 
 from tqdm import tqdm
 
-class PowerSchoolSQLInferface: 
+class PowerSchoolSQLInterface: 
     """A class, representing a interface to the Powerschool frontend
     which most teachers/students/admins have access to.
     """
@@ -23,7 +23,7 @@ class PowerSchoolSQLInferface:
         engine = sqlalchemy.create_engine('oracle://' + self.username + 
                                           ':' + self.password + 
                                           '@' + self.host + ':' +
-                                          self.port + '/' + 
+                                          "1521" + '/' + 
                                           self.dbname)
         self.conn = engine.connect()
     
